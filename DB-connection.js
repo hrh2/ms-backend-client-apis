@@ -10,7 +10,7 @@ module.exports = () => {
      mongoose.set('strictQuery', true);
 
      mongoose
-          .connect(process.env.localDB, connectionParams)
+          .connect(process.env.OnlineDB, connectionParams)
           .then(() => {
                console.log('You have successfully connected to the database');
           })
