@@ -237,7 +237,7 @@ router.get('/addviews/:id', verifyToken, async (req, res) => {
   }
 });
 
-router.get('/views/:id', async (req, res) => {
+router.get('/views/:id',verifyToken, async (req, res) => {
   try {
     const car = await Car.findById(req.params.id);
 

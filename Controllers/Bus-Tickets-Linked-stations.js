@@ -19,7 +19,7 @@ async function fetchLinkedStationNames(linkedIDs, stations) {
 }
 
 
-router.post('/tickets'/*,verifyToken*/, async (req, res) => {
+router.post('/tickets',verifyToken, async (req, res) => {
   const {from,
          to,
          date} =  req.body;
