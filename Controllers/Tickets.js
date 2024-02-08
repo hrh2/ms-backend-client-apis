@@ -12,7 +12,7 @@ router.get('/', verifyToken, async (req, res) => {
 
         return res.status(200).json({
             unUsedTickets,usedTickets,suspendedTickets,
-            msg:"Tickets received "
+            message:"Tickets received "
         });
 
     } catch (error) {

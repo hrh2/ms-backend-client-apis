@@ -19,7 +19,38 @@ async function fetchLinkedStationNames(linkedIDs, stations) {
 }
 
 
-router.get('/stations'/*,verifyToken*/, async (req, res) => {
+router.post('/tickets'/*,verifyToken*/, async (req, res) => {
+  const {from,
+         to,
+         date} =  req.body;
+  try {
+      const stationFrom= await Station.findOne({name:from});
+      const stationTo= await Station.findOne({name:to});
+      const busesCategory1 = await Buses.find({ownerStation:stationFrom._id,destinationId:stationTo._id,inUseA:true,isFull:false});
+      const busesCategory2 = await Buses.find({ownerStation:stationTo._id,destinationId:stationFrom._id,inUseA:false,isFull:false});
+      const buses = busesCategory1.concat(busesCategory2)
+      if (!buses) {
+          return res.status(404).json({ message: 'Station not found' });
+      }
+     return res.status(201).json(buses);
+  } catch (err) {
+      return res.status(500).json({message:err.message});
+  }
+});
+
+router.get('/linked',async (req,res)=>{
+  try{
+       const stations=await Station.find()
+       const linkedStations=stations.filter(station=>station.numberOfDestinations!=0)
+       if(linkedStations.length==0)
+          return res.status(404).json({message:"No linked stations found"})
+       return res.status(200).json(linkedStations);
+  }catch(err){
+      return res.status(500).json({message:err.message});
+  }
+})
+
+router.get('/stations',verifyToken, async (req, res) => {
   try {
 
     class ClientRoutes {
@@ -55,35 +86,6 @@ router.get('/stations'/*,verifyToken*/, async (req, res) => {
   }
 });
 
-
-router.post('/tickets'/*,verifyToken*/, async (req, res) => {
-  const {from,
-         to,
-         date} =  req.body;
-  try {
-      const stationFrom= await Station.findOne({name:from});
-      const stationTo= await Station.findOne({name:to});
-      const busesCategory1 = await Buses.find({ownerStation:stationFrom._id,destinationId:stationTo._id,inUseA:true,isFull:false});
-      const busesCategory2 = await Buses.find({ownerStation:stationTo._id,destinationId:stationFrom._id,inUseA:false,isFull:false});
-      const buses = busesCategory1.concat(busesCategory2)
-      if (!buses) {
-          return res.status(404).json({ message: 'Station not found' });
-      }
-     return res.status(201).json(buses);
-  } catch (err) {
-      return res.status(500).json({message:err.message});
-  }
-});
-
-router.get('/linked',async (req,res)=>{
-  try{
-       const stations=await Station.find()
-       const linkedStations=stations.filter(station=>station.numberOfDestinations!=0)
-       return res.status(200).json(linkedStations);
-  }catch(err){
-      return res.status(500).json({message:err.message});
-  }
-})
 
 module.exports = router;
 
